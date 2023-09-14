@@ -7,6 +7,7 @@ import com.example.securityspring.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,7 @@ import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
@@ -55,15 +57,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 //.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(jwtAccessDeniedHandler).authenticationEntryPoint(jwtAuthenticationEntryPoint))
+
                 .authorizeHttpRequests((authz) -> authz
                         //.requestMatchers("/favicon.ico").authenticated()
                         //.requestMatchers("/h2-console/**/**").permitAll()
                         //.requestMatchers(new AntPathRequestMatcher("/h2-console/**/**")).permitAll()
                         //.requestMatchers(PathRequest.toH2Consol e()).permitAll()
                         //.requestMatchers("/api/hello").permitAll()
-                        //.requestMatchers(new MvcRequestMatcher(introspector,"/api/hello")).permitAll()
-                        .requestMatchers(h2RequestMatcher.pattern("/api/hello")).permitAll()
-                        .requestMatchers(h2RequestMatcher.pattern("/api/signup")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector,"/api/hello")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector,"/api/authenticate")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector,"/api/signup")).permitAll()
+                        //.requestMatchers("/api/hello","/api/signup","/api/authenticate").permitAll()
+                        //.requestMatchers(h2RequestMatcher.pattern("/api/signup")).permitAll()
                         /*.requestMatchers(h2RequestMatcher.pattern("/api/authenticate")).permitAll()*/
                         .anyRequest().authenticated())
 
